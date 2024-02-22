@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export const useForm = ({ dafaultValues = {}, dafaultErrors = {} }) => {
+const validationDefault = { max: 100, min: 0, required: false };
+
+export const useForm = ({
+  dafaultValues = {},
+  dafaultErrors = {},
+  onSubmit,
+}) => {
   const [values, setValues] = useState(dafaultValues);
   const [errors, setErrors] = useState(dafaultErrors);
 
-  const Register = (name, { max, min } = { max: 100, min: 0 }) => {
+  const Register = (name, { max, min, required } = validationDefault) => {
     const [value, setValue] = useState(dafaultValues[name]);
     const [error, setError] = useState(dafaultErrors[name] || false);
     const onChange = (e) => {
@@ -30,8 +36,41 @@ export const useForm = ({ dafaultValues = {}, dafaultErrors = {} }) => {
       });
     };
 
-    return { onChange, value, "data-error": error };
+    return { onChange, value, "data-error": error, required };
   };
 
-  return { values, register: Register, errors };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(values);
+  };
+
+  return {
+    values,
+    register: Register,
+    errors,
+    handleSubmit,
+  };
+};
+
+export const useMousePosition = () => {
+  const [position, setPosition] = useState();
+
+  useEffect(() => {
+    const setUpdatePostion = (e) => {
+      setPosition({ left: e.clientX, top: e.clientY, scale: e.scale });
+    };
+    window.addEventListener("mousemove", setUpdatePostion);
+    window.addEventListener("mouseup", (e) =>
+      setUpdatePostion({ clientX: e.clientX, clientY: e.clientY, scale: "1" })
+    );
+    window.addEventListener("mousedown", (e) =>
+      setUpdatePostion({ clientX: e.clientX, clientY: e.clientY, scale: "0.8" })
+    );
+
+    return () => {
+      window.removeEventListener("mousemove", setUpdatePostion);
+    };
+  }, []);
+
+  return { position };
 };
