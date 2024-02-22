@@ -24,7 +24,7 @@ code {
   width: 50px;
   height: 50px;
   pointer-events: none;
-  transform-origin: center;
+  transform-origin: top left;
   transition: 300ms ease scale;
 }
 .cursor-custome img {
